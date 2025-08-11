@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Chatbot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            /* Updated background to a calming image */
+            background-image: url('https://source.unsplash.com/random/1920x1080?calm,nature,sky');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #d3dce0; /* Fallback color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for readability */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #007bff;
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            /* Styles for the new back button */
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.3s ease;
+        }
+        .back-button:hover {
+            color: #d9e2ec;
+        }
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid #fff;
+        }
+        .chat-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 20px;
+        }
+        #chat-box {
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .user-message, .bot-message {
+            display: flex;
+            margin: 10px 0;
+        }
+        .user-message {
+            justify-content: flex-end;
+        }
+        .bot-message {
+            justify-content: flex-start;
+        }
+        .user-message .message-bubble {
+            background-color: #007bff;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            padding: 10px 15px;
+            max-width: 75%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .bot-message .message-bubble {
+            background-color: #e9ecef;
+            color: #212529;
+            border-radius: 15px 15px 15px 0;
+            padding: 10px 15px;
+            max-width: 75%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .bot-message .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .bot-message .choice-button {
+            background-color: #f0f4f8;
+            color: #212529;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .bot-message .choice-button:hover {
+            background-color: #e2e8f0;
+        }
+        .bot-message .link-button {
+            background-color: #e9ecef;
+            color: #007bff;
+            border: 1px solid #007bff;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin-top: 5px;
+        }
+        .bot-message .link-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        #input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-right: 10px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        #user-input:focus {
+            border-color: #007bff;
+        }
+        #send-button {
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+        #send-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div class="chat-header">
+            <a href="{{ url_for('home') }}" class="back-button">&#x2190;</a>
+            <img src="{{ url_for('static', filename='images/chatbot_profile.png') }}" alt="Chatbot Profile" class="profile-pic">
+            <h1>Mental Health Chatbot</h1>
+        </div>
+        <div id="chat-box"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatBox = document.getElementById("chat-box");
+            const userInput = document.getElementById("user-input");
+            const sendButton = document.getElementById("send-button");
+
+            // Updated solutions object to include links and safer content
+            const solutions = {
+                "Anxiety": {
+                    text: "Here's a tip for managing anxiety: Try a deep-breathing exercise. Inhale slowly for 4 seconds, hold for 4 seconds, and exhale slowly for 6 seconds. Repeat this a few times to calm your nervous system.",
+                    link: "https://www.youtube.com/watch?v=WPvL2zWkEwM"
+                },
+                "Bipolar": {
+                    text: "Managing bipolar disorder often involves a combination of therapy and medication. Maintaining a stable routine, including sleep and meal times, can also be very helpful. Please consult with a healthcare professional for a proper diagnosis and treatment plan.",
+                    link: "https://www.youtube.com/watch?v=FjIuK9w52rA"
+                },
+                "Depression": {
+                    text: "For depression, it's often helpful to engage in small, achievable tasks, like taking a short walk or listening to your favorite music. Reaching out to a trusted friend or family member can also make a significant difference. Consider seeking professional help.",
+                    link: "https://www.youtube.com/watch?v=kYv-b8W0R-o"
+                },
+                "Stress": {
+                    text: "To deal with stress, try to identify the source of the stress and address it directly. In the meantime, practicing mindfulness or engaging in a hobby you enjoy can help reduce tension.",
+                    link: "https://www.youtube.com/watch?v=0h6kXpB_6qA"
+                },
+                "Suicidal": {
+                    // CRITICAL FIX: The old response was unsafe. This new response
+                    // directs the user to seek immediate professional help.
+                    text: "If you are having thoughts of suicide, please know that you are not alone and help is available. You can contact a crisis hotline or a mental health professional immediately. Your life is important, and there is support available. Please search online for a suicide prevention hotline in your area or dial the emergency number.",
+                    link: null
+                },
+                "Normal": {
+                    // FIX: The previous response was not helpful. This provides a better message.
+                    text: "It's great that you're feeling normal! Remember to continue practicing self-care and staying mindful of your well-being. If you ever need to chat, I'll be here.",
+                    link: null
+                },
+                "Personality disorder": {
+                    text: "Personality disorders are complex and require professional diagnosis and treatment. Therapy, such as Dialectical Behavior Therapy (DBT), can be very effective. It's important to work with a trained professional.",
+                    link: "https://www.youtube.com/watch?v=O1Vv_pX_j-E"
+                },
+                "Unknown": {
+                    text: "I'm sorry, I couldn't categorize your message. Please try rephrasing or providing more details.",
+                    link: null
+                }
+            };
+
+            const addMessage = (message, sender) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add(`${sender}-message`);
+                
+                if (typeof message === 'object' && message.type === 'initial-choice') {
+                    messageDiv.innerHTML = `<span class="message-bubble">${message.text}
+                        <div class="choices-container">
+                            <button class="choice-button" data-choice="continue">Continue Chatting</button>
+                            <button class="choice-button" data-choice="solve" data-problem="${message.problem}">Get a Solution</button>
+                        </div>
+                    </span>`;
+                    messageDiv.querySelectorAll('.choice-button').forEach(button => {
+                        button.addEventListener('click', handleInitialChoice);
+                    });
+                } else if (typeof message === 'object' && message.type === 'video-choice') {
+                    messageDiv.innerHTML = `<span class="message-bubble">${message.text}
+                        <div class="choices-container">
+                            <button class="choice-button" data-choice="yes-video" data-problem="${message.problem}">Yes</button>
+                            <button class="choice-button" data-choice="no-video" data-problem="${message.problem}">No</button>
+                        </div>
+                    </span>`;
+                    messageDiv.querySelectorAll('.choice-button').forEach(button => {
+                        button.addEventListener('click', handleVideoChoice);
+                    });
+                } else if (typeof message === 'object' && message.type === 'final-choice') {
+                    messageDiv.innerHTML = `<span class="message-bubble">${message.text}
+                        <div class="choices-container">
+                            <button class="choice-button" data-choice="yes">Yes</button>
+                            <button class="choice-button" data-choice="no">No</button>
+                        </div>
+                    </span>`;
+                    messageDiv.querySelectorAll('.choice-button').forEach(button => {
+                        button.addEventListener('click', handleFinalChoice);
+                    });
+                } else if (typeof message === 'object' && message.type === 'solution') {
+                    let content = message.text;
+                    if (message.link) {
+                        content += `<a href="${message.link}" target="_blank" class="link-button">Watch a Motivational Video</a>`;
+                    }
+                    messageDiv.innerHTML = `<span class="message-bubble">${content}</span>`;
+                } else {
+                    messageDiv.innerHTML = `<span class="message-bubble">${message}</span>`;
+                }
+
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
+
+            const handleInitialChoice = (event) => {
+                const choice = event.target.dataset.choice;
+                const problem = event.target.dataset.problem;
+                
+                if (choice === 'continue') {
+                    addMessage("Okay, what else is on your mind?", "bot");
+                    userInput.value = "";
+                } else if (choice === 'solve') {
+                    const solution = solutions[problem] || { text: "I don't have a specific solution for that problem at the moment.", link: null };
+                    addMessage({
+                        type: 'solution',
+                        text: solution.text
+                    }, "bot");
+
+                    // After the solution, ask the user if they need anything else
+                    if (solution.link) {
+                        addMessage({
+                            type: 'video-choice',
+                            text: "Do you want to watch a motivational video?",
+                            problem: problem
+                        }, "bot");
+                    } else {
+                        addMessage({
+                            type: 'final-choice',
+                            text: "Is there anything else I can help you with?"
+                        }, "bot");
+                    }
+                }
+            };
+
+            const handleVideoChoice = (event) => {
+                const choice = event.target.dataset.choice;
+                const problem = event.target.dataset.problem;
+                const solution = solutions[problem];
+
+                if (choice === 'yes-video' && solution.link) {
+                    addMessage("Yes", "user");
+                    addMessage({
+                        type: 'solution',
+                        text: "Here is the video link for you.",
+                        link: solution.link
+                    }, "bot");
+                } else {
+                    addMessage("No", "user");
+                }
+
+                addMessage({
+                    type: 'final-choice',
+                    text: "Is there anything else I can help you with?"
+                }, "bot");
+            };
+            
+            const handleFinalChoice = (event) => {
+                const choice = event.target.dataset.choice;
+                if (choice === 'yes') {
+                    addMessage("Yes", "user");
+                    addMessage("Okay, please tell me.", "bot");
+                    userInput.value = "";
+                } else if (choice === 'no') {
+                    addMessage("No", "user");
+                    window.location.href = "{{ url_for('home') }}";
+                }
+            };
+
+            addMessage("Hi! What is your problem? Please describe it.", "bot");
+
+            const sendMessage = async () => {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                addMessage(message, "user");
+                userInput.value = "";
+
+                try {
+                    const response = await fetch("/predict", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: message })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const predictionText = data.response;
+                    
+                    const problem = predictionText.replace("It is sign of ", "");
+
+                    addMessage({
+                        type: 'initial-choice',
+                        text: predictionText,
+                        problem: problem
+                    }, "bot");
+                    
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    addMessage("Sorry, something went wrong. Please try again.", "bot");
+                }
+            };
+
+            sendButton.addEventListener("click", sendMessage);
+
+            userInput.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
