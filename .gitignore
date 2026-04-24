@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs and runtime outputs
+logs/
+*.log
+
+# ML artifacts (generated during experiments)
+*.pkl
+*.joblib
+
+# Model/training outputs
+results/
+outputs/
+checkpoints/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
