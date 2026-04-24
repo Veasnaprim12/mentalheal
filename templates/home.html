@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Mental Health Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <header class="w-full bg-blue-600 shadow-lg text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Mental Health Chatbot</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="{{ url_for('home') }}" class="font-bold text-white border-b-2 border-white">Home</a></li>
+                    <li><a href="{{ url_for('about') }}" class="hover:text-blue-200 transition-colors duration-200">About Us</a></li>
+                    <li><a href="{{ url_for('contact') }}" class="hover:text-blue-200 transition-colors duration-200">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to the Mental Health Chatbot</h1>
+            <p class="text-lg text-gray-600 mb-8">
+                This chatbot is here to help you identify and understand your emotional state. By analyzing your messages, it can provide insights into your feelings like <b>anxiety</b>, <b>depression</b>, or <b>stress</b>. This is a great starting point for your mental health journey.
+            </p>
+            <a href="{{ url_for('chat') }}" class="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+                Go to Chatbot
+            </a>
+        </div>
+    </main>
+
+    <footer class="w-full bg-gray-800 text-white p-4 text-center mt-auto">
+        <p class="text-sm">&copy; 2025 Mental Health Chatbot. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

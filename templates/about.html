@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team</title>
+    <!-- Link to the Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for the modal overlay and content */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+            position: relative;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #4a4a4a;
+            transition: color 0.2s ease-in-out;
+        }
+        .close-button:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <header class="w-full bg-blue-600 shadow-lg text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Our Team Member</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="{{ url_for('home') }}" class="hover:text-blue-200 transition-colors duration-200">Home</a></li>
+                    <li><a href="{{ url_for('about') }}" class="hover:text-blue-200 transition-colors duration-200">About Us</a></li>
+                    <li><a href="{{ url_for('contact') }}" class="hover:text-blue-200 transition-colors duration-200">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-8 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="showProfile('PRIM Veasna', 'Data Science', 'Machine Learning Engineer', 'https://placehold.co/128x128/d1d5db/000000?text=PV')">
+                <img src="https://placehold.co/128x128/d1d5db/000000?text=PV" alt="Prim Veasna" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-white mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">PRIM Veasna</h2>
+                <p class="text-gray-600">Machine Learning Engineer</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="showProfile('TAING Korngmeng', 'Data Science', 'Front End Developer', 'https://placehold.co/128x128/9ca3af/000000?text=TK')">
+                <img src="https://placehold.co/128x128/9ca3af/000000?text=TK" alt="Taing Korngmeng" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-white mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">TAING Korngmeng</h2>
+                <p class="text-gray-600">Front End Developer</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="showProfile('PHAL Menghak', 'Data Science', 'Back End Developer', 'https://placehold.co/128x128/6b7280/000000?text=PM')">
+                <img src="https://placehold.co/128x128/6b7280/000000?text=PM" alt="Phal Menghak" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-white mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">PHAL Menghak</h2>
+                <p class="text-gray-600">Back End Developer</p>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="flex flex-col items-center text-center">
+                <img id="modal-image" src="" alt="Profile" class="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-gray-200 mb-4">
+                <h3 id="modal-name" class="text-2xl font-bold text-gray-900"></h3>
+                <p id="modal-major" class="text-lg text-gray-700 mt-1"></p>
+                <p id="modal-role" class="text-md text-gray-500 mt-2"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('profile-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalName = document.getElementById('modal-name');
+        const modalMajor = document.getElementById('modal-major');
+        const modalRole = document.getElementById('modal-role');
+
+        function showProfile(name, major, role, image) {
+            modalImage.src = image;
+            modalImage.alt = name;
+            modalName.textContent = name;
+            modalMajor.textContent = `Major: ${major}`;
+            modalRole.textContent = `Role: ${role}`;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+
+    <footer class="w-full bg-gray-800 text-white p-4 text-center mt-auto">
+        <p class="text-sm">&copy; 2025 Mental Health Chatbot. All rights reserved.</p>
+    </footer>
+</body>
+</html>
